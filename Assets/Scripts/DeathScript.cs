@@ -32,6 +32,8 @@ public class DeathScript: MonoBehaviour{
         // TODO 2 - Comprobamos que el transform del objeto que colisiona, es el player
         if (other.tag == m_Player.tag) {
             m_GameManager.SendMessage("RespawnPlayer");
+        } else if (other.tag == "Enemy") {//Para matar al enemigo si se cae al vacío.
+            Destroy(other.gameObject);
         }
 
             // TODO 3 - Enviamos un mensaje al GameManager llamando a la función "RespawnPlayer"
