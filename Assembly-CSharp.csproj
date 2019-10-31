@@ -124,6 +124,7 @@
     <Compile Include="Assets\ScriptsCase4\CameraLookAt.cs" />
     <Compile Include="Assets\ScriptsCase4\ChomperBehaviour.cs" />
     <Compile Include="Assets\ScriptsCase4\CutSceneTravel.cs" />
+    <Compile Include="Assets\ScriptsCase4\KillChomper.cs" />
     <Compile Include="Assets\ScriptsCase4\TriggerEndGame.cs" />
     <None Include="Assets\Assets\Nobiax Free Rocks\Nobiax Free Rocks.txt" />
     <None Include="Assets\Assets\Standard Assets\Skyboxes\_skybox info.txt" />

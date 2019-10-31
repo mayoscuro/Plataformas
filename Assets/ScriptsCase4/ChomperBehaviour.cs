@@ -17,13 +17,15 @@ public class ChomperBehaviour : MonoBehaviour
     private bool falling;
     private GameObject player;
     private GameManager manager;
+
+    public Transform eyes;
     Vector3 chomperCenter;
 
     private ChomperAnimation chompAnimation;
     // Start is called before the first frame update
     void Start()
     {
-        chomperCenter = new Vector3(transform.position.x,transform.position.y+0.4f, transform.position.z);
+        //chomperCenter = new Vector3(transform.position.x,transform.position.y+0.4f, transform.position.z);
         player = GameObject.FindGameObjectWithTag("Player");
         manager = GameObject.FindGameObjectWithTag("GameManager").GetComponent<GameManager>();
         //Para que empiece dirigiendose al punto 2 por ejemplo:
@@ -37,15 +39,17 @@ public class ChomperBehaviour : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        
         rayCastFunction();
-
-        if (chasing)
-        {
-            currentWayPoint = player.transform;
-            StartCoroutine(Rotate());
-        }
         if (!falling)
         {
+            if (chasing)
+            {
+            //Vector3 posPersonaje = new Vector3(player.transform.position.x, transform.position.y, player.transform.position.z);
+            currentWayPoint = player.transform/*.position = /*posPersonaje*/;
+            StartCoroutine(Rotate());
+            }
+           
             Vector3 direction = currentWayPoint.position - transform.position;
             direction.Normalize();
             //Debug.Log(currentWayPoint.name);
@@ -75,7 +79,7 @@ public class ChomperBehaviour : MonoBehaviour
                 currentWayPoint = wayPoint2;
 
             }
-            else
+            else if(currentWayPoint == wayPoint2)
             {
                 currentWayPoint = waypoint1;
             }
@@ -83,18 +87,21 @@ public class ChomperBehaviour : MonoBehaviour
 
         }
     }
-    private void OnTriggerEnter(Collider other)//Si pilla al jugador respawnea, corrige su rotación y deja de perseguirlo.
+    private IEnumerator OnTriggerEnter(Collider other)//Si pilla al jugador respawnea, corrige su rotación y deja de perseguirlo.
     {
         if (other.tag == "Player") {
-            StopCoroutine(Chase());
             
-            chasing = false; 
+            chasing = false;
+            chompAnimation.Attack();
             
             
-            currentWayPoint = wayPoint2;
-            StartCoroutine(Rotate());
+            yield return new WaitForSeconds(1.1f);
             manager.RespawnPlayer();
-
+            //gameObject.GetComponent<Collider>().enabled = true;
+            currentWayPoint = waypoint1;
+            StartCoroutine(Rotate());
+            
+            
         }
     }
 
@@ -111,31 +118,27 @@ public class ChomperBehaviour : MonoBehaviour
         {
             if (hit.transform.tag == "KillZone"/*gameObject.layer != 9*/) {
                 Debug.DrawRay(transform.position, hit.transform.position, Color.blue);
-                Debug.Log("DeathZone");
+                //Debug.Log("DeathZone");
                 falling = true;
             }
         }
-        if (Physics.Raycast(chomperCenter, fwd, out hit, 10)) {
-        Debug.DrawRay(transform.position, hit.transform.position, Color.red);
-
-        if (hit.transform.tag == "Player")
-        {
-            currentWayPoint = player.transform;
-            //checkArrived();
-            StartCoroutine(Rotate());
-
-            StartCoroutine(Chase());
-        }
-        }
-    }
-    IEnumerator Chase() {
+        Debug.DrawRay(eyes.position, fwd, Color.red);
+        if (Physics.Raycast(eyes.position, fwd, out hit, 10)) {
         
-        chasing = true;
-        yield return new WaitForSeconds(3);
-        chasing = false;
-        currentWayPoint = waypoint1;
-        StartCoroutine(Rotate());
-        
+
+            if (hit.transform.tag == "Player")
+            {
+                currentWayPoint = player.transform;
+                //checkArrived();
+                StartCoroutine(Rotate());
+                chasing = true;
+            }
+            else if(chasing) {
+                chasing = false;
+                currentWayPoint = waypoint1;
+                StartCoroutine(Rotate());
+            }
+        }
     }
 
     IEnumerator Rotate()
