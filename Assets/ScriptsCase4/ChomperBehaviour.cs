@@ -14,13 +14,16 @@ public class ChomperBehaviour : MonoBehaviour
     private bool rotate;
     public float rotationTime;
     public bool chasing;
+    private bool falling;
     private GameObject player;
     private GameManager manager;
+    Vector3 chomperCenter;
 
     private ChomperAnimation chompAnimation;
     // Start is called before the first frame update
     void Start()
     {
+        chomperCenter = new Vector3(transform.position.x,transform.position.y+0.4f, transform.position.z);
         player = GameObject.FindGameObjectWithTag("Player");
         manager = GameObject.FindGameObjectWithTag("GameManager").GetComponent<GameManager>();
         //Para que empiece dirigiendose al punto 2 por ejemplo:
@@ -41,12 +44,22 @@ public class ChomperBehaviour : MonoBehaviour
             currentWayPoint = player.transform;
             StartCoroutine(Rotate());
         }
+        if (!falling)
+        {
             Vector3 direction = currentWayPoint.position - transform.position;
             direction.Normalize();
-            Debug.Log(currentWayPoint.name);
+            //Debug.Log(currentWayPoint.name);
             transform.position += speed * direction * Time.deltaTime;
             chompAnimation.Updatefordward(speed / 2);
             checkArrived();
+        }
+        else {
+            Vector3 direction = Vector3.down;
+            direction.Normalize();
+            //Debug.Log(currentWayPoint.name);
+            transform.position += speed*4 * direction * Time.deltaTime;
+        }
+
         
     }
 
@@ -70,7 +83,7 @@ public class ChomperBehaviour : MonoBehaviour
 
         }
     }
-    private void OnTriggerEnter(Collider other)
+    private void OnTriggerEnter(Collider other)//Si pilla al jugador respawnea, corrige su rotación y deja de perseguirlo.
     {
         if (other.tag == "Player") {
             StopCoroutine(Chase());
@@ -96,12 +109,13 @@ public class ChomperBehaviour : MonoBehaviour
 
         if (Physics.Raycast(transform.position, down, out hit, Mathf.Infinity))
         {
-            if (hit.transform.tag == "KillZone") {
+            if (hit.transform.tag == "KillZone"/*gameObject.layer != 9*/) {
                 Debug.DrawRay(transform.position, hit.transform.position, Color.blue);
                 Debug.Log("DeathZone");
+                falling = true;
             }
         }
-        if (Physics.Raycast(transform.position, fwd, out hit, 10)) {
+        if (Physics.Raycast(chomperCenter, fwd, out hit, 10)) {
         Debug.DrawRay(transform.position, hit.transform.position, Color.red);
 
         if (hit.transform.tag == "Player")

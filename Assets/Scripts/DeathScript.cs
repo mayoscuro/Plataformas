@@ -34,6 +34,7 @@ public class DeathScript: MonoBehaviour{
             m_GameManager.SendMessage("RespawnPlayer");
         } else if (other.tag == "Enemy") {//Para matar al enemigo si se cae al vacío.
             Destroy(other.gameObject);
+            Debug.Log("sdfsdfsdfsdf");
         }
 
             // TODO 3 - Enviamos un mensaje al GameManager llamando a la función "RespawnPlayer"
